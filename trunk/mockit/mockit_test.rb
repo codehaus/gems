@@ -32,10 +32,10 @@ class Mock
     end
   end
 
-  private
+private
   
   def assert_all_expected_methods_called
-    assert(@expected_validation_procs.empty?, "not all expected methods called, calls left: #{@expected_calls}")
+    assert(@expected_validation_procs.empty?, "not all expected methods called, calls left: #{@expected_methods.join(', ')}")
   end
   
   def is_setup_call(method)
@@ -114,6 +114,17 @@ class MockTest < Test::Unit::TestCase
     @mock.__expect(:expected_call)
     assert_raises(Test::Unit::AssertionFailedError) do
       @mock.__verify
+    end
+  end
+
+  def test_verify_fails_with_verbose_message_if_not_all_expected_methods_were_called
+    @mock.__expect(:expected_call_one)
+    @mock.__expect(:expected_call_two)
+    begin
+      @mock.__verify
+      fail
+    rescue Test::Unit::AssertionFailedError => afe
+      assert_equal("not all expected methods called, calls left: expected_call_one, expected_call_two", afe.message)
     end
   end
   
