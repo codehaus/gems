@@ -18,6 +18,3 @@ class IsThisCovered
 		b = 11
 	end
 end
-
-itc = IsThisCovered.new()
-itc.run
