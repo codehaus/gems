@@ -75,9 +75,13 @@ class UnderCover
 	def output(file, line, i)
 		hit = Hit.new(nil, file, i, nil, nil, nil)
 		if(@hits.index(hit))
-			puts "#{line}"
+			puts line
 		else
-			puts "## #{line}"
+			if(line =~ /.*end.*/ || line.chomp == "")
+				puts line
+			else
+				puts "## #{line}"
+			end
 		end
 	end
 end
@@ -89,8 +93,5 @@ class UnderCoverTest < Test::Unit::TestCase
 		uc.enable
 		load "isthiscovered.rb"
 		uc.write_coverage
-		
-#		assert(!@build.is_log_file("."), ". is not a log file")
-#		assert(@build.is_log_file("1.log"), "1.log is a log file")
 	end
 end
