@@ -75,7 +75,11 @@ class UnderCover
 		if(@hits.index(hit))
 			puts "#{line}"
 		else
-			puts "## #{line}"
+			if(line =~ /.*end.*/ || line.chomp == "")
+				puts line
+			else
+				puts "#{line.chomp}    # NOT COVERED"
+			end
 		end
 	end
 end
