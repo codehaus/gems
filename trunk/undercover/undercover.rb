@@ -1,14 +1,20 @@
+require 'test/unit'
 
 class Hit
-	attr_reader :file, :line
-
-	def initialize(file, line)
+	attr_reader :event, :file, :line, :id, :binding, :classname
+	
+	def initialize(event, file, line, id, binding, classname)
+		@event = event
 		@file = file
 		@line = line
+		@id = id
+		@binding = binding
+		@classname = classname
 	end
 	
 	def to_s
-		"#{file}:#{line}"
+#		"#{file}:#{line} (#{id}) (#{id})"
+		"#{file}:#{line} #{id.class}"
 	end
 	
 	def in_file(file)
@@ -21,78 +27,70 @@ class Hit
 end
 
 class UnderCover
-	def initialize
+	def initialize()
 		@files= []
 		@hits = []
-		@covered_lines = 0
 	end
 	
-	def start
+	def cover(file)
+		@files<<File.expand_path(file)
+	end
+
+	def enable
 		set_trace_func proc { |event, file, line, id, binding, classname|
-			stop
-			covered(file, line)
-			start
+			disable
+			covered(event, file, line, id, binding, classname)
+			enable
 		}
 	end
 	
-	def stop
+	def disable
 		set_trace_func nil
 	end
-	
-	def covered(file, line)
-		hit = Hit.new(file, line)
-		@hits<<hit if count_as_hit(hit)
-	end
-	
-	def count_as_hit(hit)
-		in_files = @files.find do |file|
-			hit.in_file(file)
-		end
-		puts in_files
-		already_counted = @hits.index(hit)
-		puts already_counted
-		in_files && !already_counted
-	end
-	
-	def covered_lines
-		@hits.size
-	end
 
-	def add_file(file)
-		@files<<file
+	def covered(event, file, line, id, binding, classname)
+		path = File.expand_path(file)
+		if(@files.index(path) && execution?(binding))
+			hit = Hit.new(event, path, line, id, binding, classname)
+			@hits<<hit
+		end
 	end
 	
-	def print_report
-		total_lines=0
+	def execution?(binding)
+		true
+	end
+	
+	def write_coverage
 		@files.each do |file|
-			total_lines += lines_in_file(file)
-		end
-		@hits.each do |hit|
-			puts hit
-		end
-		puts "total lines: #{total_lines}"
-		puts "covered lines: #{covered_lines}"
-	end
-	
-	def lines_in_file(file)
-		total_lines = 0
-		File.open(file) do |io|
-			io.each_line do |line|
-				total_lines += 1
+			File.open(file) do |io|
+				i = 1
+				io.each_line do |line|
+					output(file, line, i)
+					i = i + 1
+				end
 			end
 		end
-		total_lines
+	end
+	
+	def output(file, line, i)
+		hit = Hit.new(nil, file, i, nil, nil, nil)
+		if(@hits.index(hit))
+			puts "#{line}"
+		else
+			puts "## #{line}"
+		end
 	end
 end
 
-uc = UnderCover.new
-
-uc.add_file(ARGV[0])
-
-uc.start
-
-# load and exec run in test source
-load ARGV[0]
-uc.stop
-
-uc.print_report
+class UnderCoverTest < Test::Unit::TestCase
+	def test_can_parse
+		uc = UnderCover.new()
+		uc.cover("isthiscovered.rb")
+		uc.enable
+		load "isthiscovered.rb"
+		uc.write_coverage
+		
+#		assert(!@build.is_log_file("."), ". is not a log file")
+#		assert(@build.is_log_file("1.log"), "1.log is a log file")
+	end
+end

@@ -1,9 +1,15 @@
+def also_run()
+	a = 10
+end
+
 def run()
-	puts "hello"
+	a = 10
+	also_run
+	a = 10
 end
 
 def not_run()
-	puts "not hello"
+	b = 8
 end
 
 run
