@@ -10,15 +10,6 @@ class Hit
 		@classname = classname
 	end
 	
-	def to_s
-#		"#{file}:#{line} (#{id}) (#{id})"
-		"#{file}:#{line} #{id.class}"
-	end
-	
-	def in_file(file)
-		@file == file
-	end
-	
 	def ==(o)
 		@file == o.file && @line == o.line
 	end
@@ -75,12 +66,16 @@ class UnderCover
 		if(@hits.index(hit))
 			puts "#{line}"
 		else
-			if(line =~ /.*end.*/ || line.chomp == "")
+			if(leave_it(line))
 				puts line
 			else
 				puts "#{line.chomp}    # NOT COVERED"
 			end
 		end
+	end
+	
+	def leave_it(line)
+		line =~ /.*end.*/ # JON!!! || line =~ /\s*/
 	end
 end
 
