@@ -12,7 +12,11 @@ class IsThisCovered
 		a = 10
 	end
 
+	# This can't be covered anyway
+
 	def not_run()
+		@a =	1
+		@bee = 	2
 		b = 8
 		b = 9
 		b = 11
