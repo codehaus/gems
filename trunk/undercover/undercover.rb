@@ -75,7 +75,7 @@ class UnderCover
 	end
 	
 	def leave_it(line)
-		line =~ /.*end.*/ # JON!!! || line =~ /\s*/
+		line =~ /.*end.*/ || line =~ /^\s*$/
 	end
 end
 
