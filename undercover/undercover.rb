@@ -1,5 +1,3 @@
-require 'test/unit'
-
 class Hit
 	attr_reader :event, :file, :line, :id, :binding, :classname
 	
@@ -75,23 +73,17 @@ class UnderCover
 	def output(file, line, i)
 		hit = Hit.new(nil, file, i, nil, nil, nil)
 		if(@hits.index(hit))
-			puts line
+			puts "#{line}"
 		else
-			if(line =~ /.*end.*/ || line.chomp == "")
-				puts line
-			else
-				puts "#{line.chomp}    # NOT COVERED"
-			end
+			puts "## #{line}"
 		end
 	end
 end
 
-class UnderCoverTest < Test::Unit::TestCase
-	def test_can_parse
-		uc = UnderCover.new()
-		uc.cover("isthiscovered.rb")
-		uc.enable
-		load "isthiscovered.rb"
-		uc.write_coverage
-	end
+if $0 == __FILE__
+	uc = UnderCover.new()
+	uc.cover(ARGV[0])
+	uc.enable
+	load ARGV[0]
+	uc.write_coverage
 end
