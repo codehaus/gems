@@ -86,8 +86,13 @@ end
 
 if $0 == __FILE__
 	uc = UnderCover.new()
-	uc.cover(ARGV[0])
+	ARGV.each do |file_spec| 
+		Dir[file_spec].each do |file|
+			uc.cover(file)
+		end
+	end
 	uc.enable
 	load ARGV[0]
+	uc.disable
 	uc.write_coverage
 end
