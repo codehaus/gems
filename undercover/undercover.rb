@@ -4,12 +4,6 @@
 # Copyright:: Copyright (c) 2003-2010 Aslak Hellesoy and Jon Tirsen. All rights reserved.
 # License:: Ruby license.
 
-    class TestCase
-      def TestCase.inherited(subclass) # intercept test cases
-        puts "YAHOOO: #{subclass.to_s}"
-      end
-    end
-
     class UnderCover
       def initialize()
         @files = []
@@ -76,13 +70,13 @@
       end
       
       def undercover(line)
-        chomped = line.chomp
-	spaces = 70 - chomped.size
-	"#{chomped} #{spaces} # NOT COVERED"
+        chomped = line.chomp.ljust(70 -  7 * line.count("\t"))
+	"#{chomped} # NOT COVERED"
+	
       end
 
       def unexecutable?(line)
-        line =~ /.*end.*/ || line =~ /^\s*$/
+        line =~ /.*end.*/ || line =~ /^\s*$/ || line =~ /^\s*#/
       end
 
       def stats(file)
