@@ -80,7 +80,7 @@ class UnderCover
 			if(line =~ /.*end.*/ || line.chomp == "")
 				puts line
 			else
-				puts "## #{line}"
+				puts "#{line.chomp}    # NOT COVERED"
 			end
 		end
 	end
